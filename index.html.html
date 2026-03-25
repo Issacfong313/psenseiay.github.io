@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Issac Fong — AI & Business Analyst</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04040f;
+  --card:rgba(255,255,255,0.05);
+  --card-b:rgba(255,255,255,0.09);
+  --card-h:rgba(255,255,255,0.09);
+  --accent:#6366f1;
+  --accent2:#06b6d4;
+  --accent3:#a855f7;
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --grd:linear-gradient(135deg,#6366f1,#06b6d4);
+  --sidebar:260px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;font-size:15px;color:var(--text)}
+
+/* ── SPACE BG ── */
+.space-bg{
+  position:fixed;inset:0;z-index:0;
+  background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1920&q=80&auto=format&fit=crop');
+  background-size:cover;background-position:center;
+}
+.space-bg::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,4,20,0.82) 0%,rgba(4,4,20,0.72) 50%,rgba(4,4,20,0.88) 100%);
+}
+
+/* ── LAYOUT ── */
+.layout{position:relative;z-index:1;display:flex;height:100vh;width:100vw}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;height:100vh;
+  display:flex;flex-direction:column;
+  background:rgba(4,4,20,0.82);backdrop-filter:blur(28px);
+  border-right:1px solid rgba(255,255,255,0.08);
+  padding:32px 20px;gap:0;overflow:hidden;
+  transition:transform 0.3s ease;
+}
+.sb-profile{display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:24px}
+.sb-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--grd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:700;color:#fff;
+  margin-bottom:12px;letter-spacing:-0.02em;
+  box-shadow:0 0 0 3px rgba(99,102,241,0.3),0 8px 24px rgba(0,0,0,0.5);
+}
+.sb-name{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.01em}
+.sb-title{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+.sb-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#4ade80;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);border-radius:100px;padding:3px 10px;margin-top:10px}
+.sb-status::before{content:'';width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+
+.nav-section-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(148,163,184,0.5);padding:0 8px;margin-bottom:6px;margin-top:4px}
+.nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all 0.18s;color:var(--muted);font-size:13px;font-weight:500;user-select:none;border:1px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.nav-item.active{background:rgba(99,102,241,0.15);color:var(--text);border-color:rgba(99,102,241,0.25);font-weight:600}
+.nav-item.active .nav-icon{color:var(--accent)}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;background:rgba(99,102,241,0.2);color:#a5b4fc;border-radius:100px;padding:2px 7px}
+
+.sb-footer{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06)}
+.sb-footer-links{display:flex;justify-content:center;gap:8px}
+.sb-link{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--muted);font-size:13px;text-decoration:none;transition:all 0.2s}
+.sb-link:hover{background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.3);color:var(--text)}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;height:100vh;overflow-y:auto;overflow-x:hidden}
+/* scrollbar */
+.main::-webkit-scrollbar{width:5px}
+.main::-webkit-scrollbar-track{background:transparent}
+.main::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+.main::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,0.5)}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding:56px 56px 80px;animation:pageIn 0.35s ease both}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:48px}
+.page-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:14px}
+.page-eyebrow::before{content:'';width:18px;height:2px;background:var(--accent2);border-radius:2px}
+.page-title{font-size:clamp(32px,4vw,48px);font-weight:700;line-height:1.1;letter-spacing:-0.025em}
+.page-title .g{background:var(--grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-desc{color:var(--muted);font-size:15px;line-height:1.75;max-width:560px;margin-top:12px}
+
+/* ── GLASS CARD ── */
+.card{background:rgba(8,8,30,0.55);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:18px;transition:all 0.22s}
+.card:hover{background:rgba(12,12,40,0.68);border-color:rgba(99,102,241,0.25);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,0.55)}
+
+/* ── PILL / CHIP ── */
+.chip{font-size:11px;font-weight:500;padding:4px 12px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);color:var(--muted)}
+.chip.hi{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.25);color:#a5b4fc}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+
+/* gradient text util */
+.g{background:var(--grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ═══════════════════════════════
+   PAGE: HOME
+═══════════════════════════════ */
+.home-hero{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 136px)}
+.home-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.22);border-radius:100px;padding:7px 18px;font-size:12px;font-weight:500;color:#a5b4fc;letter-spacing:0.04em;margin-bottom:28px;width:fit-content;animation:fadeUp 0.6s both}
+.home-eyebrow .dp{width:6px;height:6px;border-radius:50%;background:#6366f1;box-shadow:0 0 8px #6366f1;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.home-title{font-size:clamp(48px,6vw,90px);font-weight:700;line-height:1.0;letter-spacing:-0.03em;animation:fadeUp 0.6s 0.08s both}
+.home-title .line2{background:var(--grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.home-sub{max-width:540px;color:var(--muted);font-size:16px;line-height:1.8;margin-top:22px;animation:fadeUp 0.6s 0.16s both}
+.home-btns{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap;animation:fadeUp 0.6s 0.24s both}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.2s;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.btn-grad{background:var(--grd);color:#fff;box-shadow:0 8px 28px rgba(99,102,241,0.3)}
+.btn-grad:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(99,102,241,0.5)}
+.btn-out{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid rgba(255,255,255,0.1)}
+.btn-out:hover{border-color:rgba(99,102,241,0.4);background:rgba(99,102,241,0.08)}
+.home-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:56px;animation:fadeUp 0.6s 0.32s both}
+.stat-card{padding:20px 16px;border-radius:14px;text-align:center}
+.stat-n{font-size:28px;font-weight:700;background:var(--grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.stat-l{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;line-height:1.4}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════
+   PAGE: ABOUT
+═══════════════════════════════ */
+.about-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+.about-copy{padding:32px;border-radius:18px}
+.about-copy p{color:var(--muted);line-height:1.9;font-size:15px}
+.about-copy p+p{margin-top:14px}
+.about-copy strong{color:var(--text)}
+.info-list{display:flex;flex-direction:column;gap:10px}
+.irow{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;transition:all 0.2s}
+.irow:hover{transform:translateX(4px)}
+.iico{width:36px;height:36px;border-radius:9px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ilbl{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase}
+.ival{font-size:13px;color:var(--text);font-weight:500;margin-top:2px}
+
+/* ═══════════════════════════════
+   PAGE: EXPERIENCE
+═══════════════════════════════ */
+.timeline{display:flex;flex-direction:column;gap:16px}
+.tl{padding:26px 30px;border-radius:18px;position:relative;overflow:hidden}
+.tl::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grd);border-radius:0 2px 2px 0;opacity:0;transition:opacity 0.22s}
+.tl:hover::before{opacity:1}
+.tl-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.tl-role{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.01em}
+.tl-badge{font-size:11px;font-weight:600;padding:3px 11px;border-radius:100px;background:rgba(99,102,241,0.12);color:#a5b4fc;border:1px solid rgba(99,102,241,0.2);white-space:nowrap}
+.tl-meta{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.tl-co{font-size:13px;font-weight:600;color:var(--accent2)}
+.tl-dt{font-size:12px;color:var(--muted)}
+.tl-desc{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:14px}
+.tl-list{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:14px;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.tl-list li::marker{color:var(--accent2)}
+
+/* ═══════════════════════════════
+   PAGE: SKILLS
+═══════════════════════════════ */
+.sk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.sk-card{padding:26px;border-radius:18px}
+.sk-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sk-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sk-title{font-size:15px;font-weight:700;color:var(--text)}
+.sk-pills{display:flex;flex-wrap:wrap;gap:8px}
+.sk-p{font-size:11px;font-weight:500;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);color:var(--muted);transition:all 0.18s;cursor:default}
+.sk-p:hover{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.28);color:#a5b4fc}
+
+/* ═══════════════════════════════
+   PAGE: VIDEOS
+═══════════════════════════════ */
+.vid-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.vid-card{border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.vid-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000}
+.vid-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.vid-info{padding:22px 26px}
+.vid-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.vid-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px;letter-spacing:-0.01em}
+.vid-desc{font-size:13px;color:var(--muted);line-height:1.75}
+
+/* ═══════════════════════════════
+   PAGE: EDUCATION
+═══════════════════════════════ */
+.edu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:40px}
+.edu-card{padding:26px;border-radius:18px;display:flex;flex-direction:column;gap:10px}
+.edu-ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:4px}
+.edu-deg{font-size:15px;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:-0.01em}
+.edu-school{font-size:12px;font-weight:600;color:var(--accent2);margin-top:2px}
+.edu-note{font-size:12px;color:var(--muted);line-height:1.65}
+.edu-yr{display:inline-flex;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);color:var(--accent2);width:fit-content;margin-top:auto}
+
+/* ═══════════════════════════════
+   PAGE: LANGUAGES
+═══════════════════════════════ */
+.lang-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.lang-card{padding:32px;border-radius:18px;text-align:center}
+.lang-em{font-size:40px;margin-bottom:14px}
+.lang-nm{font-size:22px;font-weight:700;color:var(--text)}
+.lang-lv{font-size:12px;font-weight:600;color:var(--accent2);margin-top:4px;letter-spacing:0.04em}
+.lbar{height:4px;background:rgba(255,255,255,0.07);border-radius:4px;margin-top:22px;overflow:hidden}
+.lbar-f{height:100%;border-radius:4px;background:var(--grd);width:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.lbar-f.anim{width:var(--w)}
+.lang-detail{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ═══════════════════════════════
+   PAGE: CONTACT
+═══════════════════════════════ */
+.contact-wrap{max-width:680px}
+.contact-hero{padding:40px;border-radius:20px;margin-bottom:24px}
+.contact-hero p{color:var(--muted);font-size:15px;line-height:1.8}
+.contact-hero p+p{margin-top:12px}
+.contact-hero strong{color:var(--text)}
+.clinks-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.clink{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:14px;text-decoration:none;transition:all 0.2s}
+.clink:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.5);border-color:rgba(99,102,241,0.35)!important}
+.cico{width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.14);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.clbl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.cval{font-size:13px;font-weight:600;color:var(--text);margin-top:2px}
+
+/* ── MOBILE TOGGLE ── */
+.mob-menu-btn{display:none;position:fixed;bottom:24px;right:24px;z-index:2000;width:52px;height:52px;border-radius:50%;background:var(--grd);border:none;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 8px 24px rgba(99,102,241,0.4);align-items:center;justify-content:center}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  :root{--sidebar:0px}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;transform:translateX(-100%);z-index:1500}
+  .sidebar.open{transform:translateX(0)}
+  .mob-menu-btn{display:flex}
+  .page{padding:40px 24px 80px}
+  .home-stats{grid-template-columns:repeat(3,1fr)}
+  .about-grid,.sk-grid,.vid-grid,.edu-grid,.lang-grid,.clinks-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="space-bg"></div>
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-profile">
+      <div class="sb-avatar">IF</div>
+      <div class="sb-name">Issac Fong</div>
+      <div class="sb-title">IT Business Analyst<br>AI Integration Specialist<br><span style="color:rgba(148,163,184,0.6);font-size:10px">MSc AI &amp; Big Data · PolyU</span></div>
+      <div class="sb-status">Open to Work</div>
+    </div>
+
+    <div class="nav-section-label">Menu</div>
+    <ul class="nav-list">
+      <li class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span> Home
+      </li>
+      <li class="nav-item" data-page="about">
+        <span class="nav-icon">👤</span> About Me
+      </li>
+      <li class="nav-item" data-page="experience">
+        <span class="nav-icon">💼</span> Experience
+        <span class="nav-badge">5</span>
+      </li>
+      <li class="nav-item" data-page="skills">
+        <span class="nav-icon">⚡</span> Skills
+      </li>
+      <li class="nav-item" data-page="videos">
+        <span class="nav-icon">🎬</span> Videos
+        <span class="nav-badge">2</span>
+      </li>
+      <li class="nav-item" data-page="education">
+        <span class="nav-icon">🎓</span> Education
+      </li>
+      <li class="nav-item" data-page="languages">
+        <span class="nav-icon">🌐</span> Languages
+      </li>
+      <li class="nav-item" data-page="contact">
+        <span class="nav-icon">✉️</span> Contact
+      </li>
+    </ul>
+
+    <div class="sb-footer">
+      <div class="sb-footer-links">
+        <a href="mailto:Psenseiay@gmail.com" class="sb-link" title="Email">✉</a>
+        <a href="https://www.linkedin.com/in/isaac-fong-psenseiay" target="_blank" class="sb-link" title="LinkedIn">in</a>
+        <a href="tel:+85269194486" class="sb-link" title="Phone">☎</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main" id="main">
+
+    <!-- ▸ HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <div class="home-eyebrow"><span class="dp"></span> Hong Kong · Open to Opportunities</div>
+        <h1 class="home-title">IT Analyst &<br><span class="line2">AI Specialist</span></h1>
+        <p class="home-sub">IT Business Analyst | AI Integration Specialist with 10+ years across AI, project management, and financial services. Proven track record delivering complex ERP and AI-enhanced systems end-to-end. Currently pursuing MSc in Artificial Intelligence and Big Data Computing at Hong Kong Polytechnic University (Expected 2026).</p>
+        <div class="home-btns">
+          <button class="btn btn-grad" onclick="goTo('experience')">View Experience ↗</button>
+          <button class="btn btn-out" onclick="goTo('contact')">Get In Touch</button>
+        </div>
+        <div class="home-stats">
+          <div class="card stat-card"><div class="stat-n">10+</div><div class="stat-l">Years Experience</div></div>
+          <div class="card stat-card"><div class="stat-n">3+</div><div class="stat-l">Years in AI</div></div>
+          <div class="card stat-card"><div class="stat-n">100+</div><div class="stat-l">Users Trained</div></div>
+          <div class="card stat-card"><div class="stat-n">60%</div><div class="stat-l">ML Prep Time Saved</div></div>
+          <div class="card stat-card"><div class="stat-n">3</div><div class="stat-l">Languages Spoken</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ ABOUT -->
+    <div class="page" id="page-about">
+      <div class="page-header">
+        <div class="page-eyebrow">About Me</div>
+        <h2 class="page-title">Where <span class="g">AI meets</span> business</h2>
+        <p class="page-desc">A rare profile combining hands-on AI engineering with deep enterprise delivery and financial services roots.</p>
+      </div>
+      <div class="about-grid">
+        <div class="card about-copy">
+          <p>In enterprise consulting, technical expertise and business acumen rarely come in the same person. <strong>I am one of the exceptions.</strong></p>
+          <p>With 10+ years spanning financial services, enterprise project delivery, and hands-on AI engineering, I bring a profile that consulting and enterprise clients increasingly need but seldom find: someone who can sit with a C-suite stakeholder to define requirements in the morning, and review a <strong>Python model&#x2019;s feature engineering pipeline</strong> in the afternoon.</p>
+          <p>My career has been built at this intersection. At Standard Chartered and Prudential, I developed the <strong>financial fluency and client discipline</strong> that enterprise engagements demand. At Petsarray, I led the end-to-end integration of AI into core business systems — independently owning requirements, vendor selection, build, UAT, and training. The results were tangible: <strong>error rates down 40%</strong>, <strong>ML prep time cut by 60%</strong>, projects delivered ahead of schedule.</p>
+          <p>I am currently pursuing an <strong>MSc in Artificial Intelligence and Big Data Computing at Hong Kong Polytechnic University</strong> — not to pivot, but to deepen. I bring this academic investment into every engagement, staying ahead of the curve so my clients don&#x2019;t have to. Fluent in <strong>English (C1), Mandarin (C2), and Cantonese (C2)</strong>, I engage confidently with diverse stakeholders across the region.</p>
+        </div>
+        <div class="info-list">
+          <div class="card irow"><div class="iico">📍</div><div><div class="ilbl">Location</div><div class="ival">Kwun Tong, Kowloon, HK</div></div></div>
+          <div class="card irow"><div class="iico">🎓</div><div><div class="ilbl">Current Study</div><div class="ival">MSc AI &amp; Big Data · PolyU (2026)</div></div></div>
+          <div class="card irow"><div class="iico">📧</div><div><div class="ilbl">Email</div><div class="ival"><a href="mailto:Psenseiay@gmail.com" class="__cf_email__" data-cfemail="613112040f120408001821060c00080d4f020e0c">[email&#160;protected]</a></div></div></div>
+          <div class="card irow"><div class="iico">📱</div><div><div class="ilbl">Phone</div><div class="ival">+852 6919 4486</div></div></div>
+          <div class="card irow"><div class="iico">🔗</div><div><div class="ilbl">LinkedIn</div><div class="ival">isaac-fong-psenseiay</div></div></div>
+          <div class="card irow"><div class="iico">💼</div><div><div class="ilbl">Status</div><div class="ival">Open to opportunities</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ EXPERIENCE -->
+    <div class="page" id="page-experience">
+      <div class="page-header">
+        <div class="page-eyebrow">Career</div>
+        <h2 class="page-title">Professional <span class="g">Experience</span></h2>
+        <p class="page-desc">10+ years delivering results across AI integration, enterprise systems, and financial services.</p>
+      </div>
+      <div class="timeline">
+        <div class="card tl">
+          <div class="tl-top"><div class="tl-role">Project Manager · AI Solutions</div><div class="tl-badge">Most Recent</div></div>
+          <div class="tl-meta"><span class="tl-co">Petsarray Limited</span><span class="tl-dt">Apr 2023 — Feb 2026</span></div>
+          <ul class="tl-list">
+            <li>Independently gathered and documented detailed user requirements (UR), functional specifications, use cases, and process flows for AI-enhanced ERP/POS systems, accelerating development by ~25%.</li>
+            <li>Led vendor evaluations, solution comparisons, and AI tool selections; coordinated procurement processes and budget tracking for AI initiatives.</li>
+            <li>Optimized generative AI tools via advanced prompt engineering and logic refinement, reducing errors by 40% and enhancing reliability for decision-making workflows.</li>
+            <li>Developed and deployed NLP-based sentiment analysis models on customer/feedback data, delivering actionable insights transferable to market sentiment analysis for trading/risk applications.</li>
+            <li>Built Python prototypes for AI-driven recommendation engines integrated with transactional data; automated data pipelines (cleaning, feature engineering), cutting ML prep time by 60%.</li>
+            <li>Collaborated with data science, business, and end-user teams to refine predictive models for forecasting and optimization, contributing to accurate planning and risk-informed decisions.</li>
+            <li>Managed full UAT cycles, defect resolution, verification, user manual updates, training delivery (50+ users), and successful feature launches; monitored post-launch issues.</li>
+            <li>Regularly reported project status, risks, and issues to leadership; organized stakeholder meetings, resolved blockers, and drove tasks to meet tight deadlines.</li>
+            <li>Fostered academic partnerships to integrate cutting-edge AI research into business solutions, demonstrating proactive innovation in predictive analytics.</li>
+          </ul>
+          <div class="chips" style="margin-top:14px"><span class="chip hi">AI/ML</span><span class="chip hi">NLP</span><span class="chip hi">Python</span><span class="chip hi">Prompt Engineering</span><span class="chip">ERP/POS</span><span class="chip">UAT</span><span class="chip">Vendor Evaluation</span><span class="chip">Data Pipelines</span><span class="chip">Predictive Modeling</span><span class="chip">Budget Tracking</span></div>
+        </div>
+        <div class="card tl">
+          <div class="tl-top"><div class="tl-role">Project Manager</div></div>
+          <div class="tl-meta"><span class="tl-co">YiShing Inc.</span><span class="tl-dt">Jul 2018 — Jul 2022</span></div>
+          <ul class="tl-list">
+            <li>Led end-to-end ERP (Oracle NetSuite) implementation across production planning, inventory control, supply chain, and finance departments, enabling real-time visibility and reducing stock discrepancies by approximately 25–35%.</li>
+            <li>Coordinated multi-functional teams (production, operations, logistics, finance) and external vendors, successfully delivering system rollouts and upgrades on time and within budget for a company exporting to North America, Europe, and Middle East.</li>
+            <li>Managed full project lifecycles using Agile and Waterfall methodologies, including requirements gathering, risk assessment, resource allocation, change management, and post-go-live support for manufacturing workflows.</li>
+            <li>Optimized cross-departmental processes in a high-volume OEM/ODM environment, streamlining production scheduling and material procurement to support diversified infant product lines.</li>
+            <li>Controlled project budgets, timelines, and mitigation of operational risks, contributing to improved supply chain efficiency and reduced lead times in a multi-site operation (HK + mainland China factory).</li>
+            <li>Facilitated stakeholder engagement with senior management and department heads, delivering status reports, training sessions, and documentation ensuring smooth adoption across 100+ users.</li>
+          </ul>
+          <div class="chips" style="margin-top:14px"><span class="chip hi">Oracle NetSuite</span><span class="chip hi">Agile &amp; Waterfall</span><span class="chip">ERP Implementation</span><span class="chip">Supply Chain</span><span class="chip">Risk Management</span><span class="chip">Change Management</span><span class="chip">Multi-site Operations</span></div>
+        </div>
+        <div class="card tl">
+          <div class="tl-top"><div class="tl-role">Wealth Management Advisor</div></div>
+          <div class="tl-meta"><span class="tl-co">Prudential Hong Kong</span><span class="tl-dt">Mar 2014 — Mar 2018</span></div>
+          <ul class="tl-list">
+            <li>Provided financial planning solutions, risk assessments, and investment recommendations to clients.</li>
+            <li>Maintained strong client communication and managed multiple portfolios effectively.</li>
+            <li>Conducted needs analysis and provided advisory on long-term financial strategies.</li>
+          </ul>
+          <div class="chips" style="margin-top:14px"><span class="chip">Financial Planning</span><span class="chip">Risk Assessment</span><span class="chip">Portfolio Management</span><span class="chip">Client Advisory</span></div>
+        </div>
+        <div class="card tl">
+          <div class="tl-top"><div class="tl-role">Financial Advisor</div></div>
+          <div class="tl-meta"><span class="tl-co">Standard Chartered Bank</span><span class="tl-dt">Jul 2009 — Aug 2013</span></div>
+          <ul class="tl-list">
+            <li>Delivered financial advice, investment planning, and risk assessments for retail clients.</li>
+            <li>Prepared financial plans, conducted client assessments, and supported business growth initiatives.</li>
+          </ul>
+          <div class="chips" style="margin-top:14px"><span class="chip">Investment Planning</span><span class="chip">Client Management</span><span class="chip">Risk Assessment</span><span class="chip">Financial Advisory</span></div>
+        </div>
+        <div class="card tl">
+          <div class="tl-top"><div class="tl-role">Founder · Motor Trading Business</div><div class="tl-badge" style="background:rgba(168,85,247,0.12);color:#d8b4fe;border-color:rgba(168,85,247,0.2)">16 Years</div></div>
+          <div class="tl-meta"><span class="tl-co">Self-Employed</span><span class="tl-dt">2010 — Present</span></div>
+          <ul class="tl-list">
+            <li>Established and managed a profitable side business specializing in motor trading (sourcing, buying, selling, and exporting motors/related components), achieving an average 20% YoY increase in sales volume over 16 years.</li>
+            <li>Conducted market research, risk assessments, and predictive forecasting to identify trends in supply/demand, optimizing inventory turnover and minimizing losses — skills directly transferable to financial markets, algo trading, and risk management.</li>
+            <li>Handled end-to-end operations including vendor negotiations, procurement, logistics coordination, and client relationship management in multilingual environments (English, Mandarin, Cantonese), building a network of 50+ suppliers and buyers across Asia.</li>
+            <li>Implemented data tracking tools (Excel/SQL for inventory and sales analytics) and process optimizations, reducing operational costs by 15% and improving efficiency in a competitive trading landscape.</li>
+            <li>Balanced full-time employment with business demands, demonstrating strong time management, self-motivation, and entrepreneurial initiative while ensuring compliance with Hong Kong trade regulations.</li>
+          </ul>
+          <div class="chips" style="margin-top:14px"><span class="chip hi">Entrepreneurship</span><span class="chip">Market Analysis</span><span class="chip">SQL / Excel</span><span class="chip">Procurement</span><span class="chip">Multilingual Ops</span><span class="chip">Predictive Forecasting</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ SKILLS -->
+    <div class="page" id="page-skills">
+      <div class="page-header">
+        <div class="page-eyebrow">Capabilities</div>
+        <h2 class="page-title">Core <span class="g">Skills</span></h2>
+        <p class="page-desc">A full-stack business and AI skillset built across a decade of real-world delivery.</p>
+      </div>
+      <div class="sk-grid">
+        <div class="card sk-card">
+          <div class="sk-head"><div class="sk-ico" style="background:rgba(99,102,241,0.14)">🧠</div><div class="sk-title">AI & Technical</div></div>
+          <div class="sk-pills"><span class="sk-p">Python</span><span class="sk-p">SQL</span><span class="sk-p">NLP</span><span class="sk-p">Predictive Modeling</span><span class="sk-p">Prompt Engineering</span><span class="sk-p">ML Data Pipelines</span><span class="sk-p">Recommendation Systems</span><span class="sk-p">Sentiment Analysis</span><span class="sk-p">ERP/POS/Financial Systems</span><span class="sk-p">Microsoft 365</span><span class="sk-p">Power Automate</span><span class="sk-p">Cloud Platforms</span></div>
+        </div>
+        <div class="card sk-card">
+          <div class="sk-head"><div class="sk-ico" style="background:rgba(6,182,212,0.14)">📋</div><div class="sk-title">Business & IT Analysis</div></div>
+          <div class="sk-pills"><span class="sk-p">Requirements Gathering (UR/BRD)</span><span class="sk-p">Process Mapping</span><span class="sk-p">Gap Analysis</span><span class="sk-p">Stakeholder Alignment</span><span class="sk-p">UAT / Testing</span><span class="sk-p">Launch Preparation</span><span class="sk-p">Documentation</span><span class="sk-p">Change Management</span></div>
+        </div>
+        <div class="card sk-card">
+          <div class="sk-head"><div class="sk-ico" style="background:rgba(168,85,247,0.14)">🗂️</div><div class="sk-title">Project & Procurement</div></div>
+          <div class="sk-pills"><span class="sk-p">Independent Project Initiation</span><span class="sk-p">Vendor Evaluation / Selection</span><span class="sk-p">Budget &amp; Procurement Coordination</span><span class="sk-p">Status / Risk Reporting</span><span class="sk-p">Issue Resolution</span><span class="sk-p">Meeting Facilitation</span><span class="sk-p">Agile</span><span class="sk-p">Waterfall</span></div>
+        </div>
+        <div class="card sk-card">
+          <div class="sk-head"><div class="sk-ico" style="background:rgba(16,185,129,0.14)">📈</div><div class="sk-title">Financial & Risk</div></div>
+          <div class="sk-pills"><span class="sk-p">Risk Assessment</span><span class="sk-p">Investment Analysis</span><span class="sk-p">Predictive Forecasting</span><span class="sk-p">Sentiment Analysis</span><span class="sk-p">Market Signals (Transferable)</span><span class="sk-p">Algo / Risk Management</span><span class="sk-p">Stakeholder Engagement</span><span class="sk-p">Cross-Functional Collaboration</span><span class="sk-p">Training Delivery</span><span class="sk-p">Team Player</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ VIDEOS -->
+    <div class="page" id="page-videos">
+      <div class="page-header">
+        <div class="page-eyebrow">In Action</div>
+        <h2 class="page-title">Featured <span class="g">Videos</span></h2>
+        <p class="page-desc">My academic journey and volunteer work — bringing my story to life beyond the CV.</p>
+      </div>
+      <div class="vid-grid">
+        <div class="card vid-card">
+          <div class="vid-wrap">
+            <iframe src="https://www.youtube.com/embed/mLfAgsBCFM0" title="HKMU Interview — Learning Skills and Study Attitude" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="vid-info">
+            <div class="vid-tag">🎓 University Feature</div>
+            <div class="vid-title">HKMU Interview — Learning Skills &amp; Study Attitude</div>
+            <p class="vid-desc">A feature interview by Hong Kong Metropolitan University highlighting my approach to learning, academic mindset, and study attitude. In this interview, I share how I stay driven as a working professional pursuing higher education, how I tackle challenging subjects, and the values that shape my commitment to continuous self-improvement — both in the classroom and in my career.</p>
+          </div>
+        </div>
+        <div class="card vid-card">
+          <div class="vid-wrap">
+            <iframe src="https://www.youtube.com/embed/7p1P7FFdbj0" title="Volunteer Experiences" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="vid-info">
+            <div class="vid-tag">🤝 Community</div>
+            <div class="vid-title">Volunteer Experiences</div>
+            <p class="vid-desc">Beyond my professional career, I'm committed to giving back. This video showcases my volunteer work and community engagement — reflecting my core values of collaboration, initiative, and making a positive impact beyond the workplace.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ EDUCATION -->
+    <div class="page" id="page-education">
+      <div class="page-header">
+        <div class="page-eyebrow">Academic</div>
+        <h2 class="page-title">Education & <span class="g">Qualifications</span></h2>
+        <p class="page-desc">A strong academic foundation across AI, computing, and information technology.</p>
+      </div>
+      <div class="edu-grid">
+        <div class="card edu-card">
+          <div class="edu-ico" style="background:rgba(99,102,241,0.14)">🏛️</div>
+          <div class="edu-deg">Master of Science in Artificial Intelligence and Big Data Computing</div>
+          <div class="edu-school">Hong Kong Polytechnic University (PolyU)</div>
+          <p class="edu-note">Artificial intelligence, big data computing, NLP, predictive modeling, and AI applications in business and finance. Combining strong academic rigour with real-world delivery experience.</p>
+          <div class="edu-yr">Expected 2026</div>
+        </div>
+        <div class="card edu-card">
+          <div class="edu-ico" style="background:rgba(6,182,212,0.14)">💻</div>
+          <div class="edu-deg">Bachelor of Science in Computing</div>
+          <div class="edu-school">Hong Kong Metropolitan University</div>
+          <p class="edu-note">Comprehensive grounding in software engineering, systems design, databases, and computing principles.</p>
+          <div class="edu-yr">07/2025</div>
+        </div>
+        <div class="card edu-card">
+          <div class="edu-ico" style="background:rgba(168,85,247,0.14)">🔬</div>
+          <div class="edu-deg">Associate of Science in Information Technology</div>
+          <div class="edu-school">Hong Kong Polytechnic University</div>
+          <p class="edu-note">Foundation in IT systems, networking, and technology infrastructure within enterprise environments.</p>
+          <div class="edu-yr">01/2024</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ LANGUAGES -->
+    <div class="page" id="page-languages">
+      <div class="page-header">
+        <div class="page-eyebrow">Communication</div>
+        <h2 class="page-title">Multilingual <span class="g">Fluency</span></h2>
+        <p class="page-desc">Trilingual fluency enabling effective stakeholder communication across Hong Kong markets and beyond.</p>
+      </div>
+      <div class="lang-grid">
+        <div class="card lang-card">
+          <div class="lang-em">🇭🇰</div>
+          <div class="lang-nm">Cantonese</div>
+          <div class="lang-lv">Native · C2 Proficient</div>
+          <div class="lbar"><div class="lbar-f" style="--w:100%"></div></div>
+          <p class="lang-detail">Native tongue. Used daily in business, client meetings, and stakeholder communication across Hong Kong.</p>
+        </div>
+        <div class="card lang-card">
+          <div class="lang-em">🇨🇳</div>
+          <div class="lang-nm">Mandarin</div>
+          <div class="lang-lv">Proficient · C2</div>
+          <div class="lbar"><div class="lbar-f" style="--w:100%"></div></div>
+          <p class="lang-detail">Full professional proficiency. Actively used in vendor negotiations, cross-border operations, and mainland China partnerships.</p>
+        </div>
+        <div class="card lang-card">
+          <div class="lang-em">🇬🇧</div>
+          <div class="lang-nm">English</div>
+          <div class="lang-lv">Advanced · C1</div>
+          <div class="lbar"><div class="lbar-f" style="--w:85%"></div></div>
+          <p class="lang-detail">Advanced professional level. Used for documentation, international stakeholder communication, and academic work at Hong Kong Polytechnic University.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ CONTACT -->
+    <div class="page" id="page-contact">
+      <div class="page-header">
+        <div class="page-eyebrow">Get In Touch</div>
+        <h2 class="page-title">Let's <span class="g">Collaborate</span></h2>
+        <p class="page-desc">Open to roles in AI integration, business analysis, and fintech across Hong Kong and beyond.</p>
+      </div>
+      <div class="contact-wrap">
+        <div class="card contact-hero">
+          <p>I'm currently <strong>open to new opportunities</strong> in AI integration, IT business analysis, and financial technology. With 10+ years of experience and an MSc in Artificial Intelligence and Big Data Computing underway at Hong Kong Polytechnic University, I bring both strategic thinking and hands-on technical delivery.</p>
+          <p>Whether you're looking to integrate AI into your business workflows, need a seasoned project manager for a complex ERP rollout, or want to discuss how NLP and predictive modeling can unlock value in your financial operations — <strong>I'd love to connect</strong>.</p>
+        </div>
+        <div class="clinks-grid">
+          <a href="mailto:Psenseiay@gmail.com" class="card clink">
+            <div class="cico">✉️</div>
+            <div><div class="clbl">Email</div><div class="cval">Psenseiay@gmail.com</div></div>
+          </a>
+          <a href="https://www.linkedin.com/in/isaac-fong-psenseiay" target="_blank" class="card clink">
+            <div class="cico" style="font-size:14px;font-weight:700">in</div>
+            <div><div class="clbl">LinkedIn</div><div class="cval">isaac-fong-psenseiay</div></div>
+          </a>
+          <a href="tel:+85269194486" class="card clink">
+            <div class="cico">📞</div>
+            <div><div class="clbl">Phone</div><div class="cval">+852 6919 4486</div></div>
+          </a>
+          <div class="card clink" style="cursor:default">
+            <div class="cico">📍</div>
+            <div><div class="clbl">Location</div><div class="cval">Kwun Tong, Kowloon, HK</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Mobile menu button -->
+<button class="mob-menu-btn" id="mobBtn" onclick="toggleSidebar()">☰</button>
+<script>
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector('[data-page="' + page + '"]').classList.add('active');
+  document.getElementById('main').scrollTo({top: 0, behavior: 'instant'});
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => goTo(item.dataset.page));
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Animate language bars when languages page is opened
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (item.dataset.page === 'languages') {
+      setTimeout(() => {
+        document.querySelectorAll('.lbar-f').forEach(b => b.classList.add('anim'));
+      }, 100);
+    }
+  });
+});
+</script>
+</body>
+</html>
